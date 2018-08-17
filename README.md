@@ -1,2 +1,2 @@
 # auditd-mitre
-Enhanced MITRE auditd rules for linux
+Enhanced auditd rules for linux, mapped on the MITRE ATT&CK matrix
