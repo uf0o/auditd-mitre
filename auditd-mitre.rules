@@ -1,14 +1,13 @@
-# auditd-attack-mitre
+# enhanced auditd MITRE-mapped attack rule set
 # An enhanced Linux Auditd configuration mapped to MITRE's Attack Framework
-#
 #
 # Compiled by Matteo Malvica
 #
 # Created  : 2018/08/17
 # Modified : 2018/08/xx
 #
-# Based on Florian Roth work 
-# 
+# Based on Florian Roth work
+
 # Remove any existing rules
 -D
 
@@ -84,14 +83,8 @@
 -a always,exit -F arch=b64 -S finit_module -S init_module -S delete_module -F auid!=-1 -k T1215_Kernel_Modules_and_Extensions
 -a always,exit -F arch=b32 -S finit_module -S init_module -S delete_module -F auid!=-1 -k T1215_Kernel_Modules_and_Extensions
 -w /etc/modprobe.conf -p wa -k T1215_Kernel_Modules_and_Extensions
-
-## KExec usage (all actions)
 -a always,exit -F arch=b64 -S kexec_load -k T1215_Kernel_Modules_and_Extensions
 -a always,exit -F arch=b32 -S sys_kexec_load -k T1215_Kernel_Modules_and_Extensions
-
-## Special files
--a exit,always -F arch=b32 -S mknod -S mknodat -k specialfiles
--a exit,always -F arch=b64 -S mknod -S mknodat -k specialfiles
 
 ## Mount operations (only attributable)
 -a always,exit -F arch=b64 -S mount -S umount2 -F auid!=-1 -k mount
@@ -282,6 +275,8 @@
 -w /usr/bin/ssh -p x -k T1219_Remote_Access_Tools
 -w /usr/bin/socat -p x -k T1219_Remote_Access_Tools
 -w /usr/bin/rdesktop -p x -k T1219_Remote_Access_Tools
+-a exit,always -F arch=b32 -S mknod -S mknodat -k T1219_Remote_Access_Tools
+-a exit,always -F arch=b64 -S mknod -S mknodat -k T1219_Remote_Access_Tools
 
 ## Code injection Related Events
 -a always,exit -F arch=b32 -S ptrace -k T1055_Process_Injection
