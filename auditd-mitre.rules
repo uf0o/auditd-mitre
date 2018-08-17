@@ -1,4 +1,4 @@
-# enhanced auditd MITRE-mapped attack rule set
+# auditd-attack-mitre
 # An enhanced Linux Auditd configuration mapped to MITRE's Attack Framework
 #
 # Compiled by Matteo Malvica
@@ -83,16 +83,14 @@
 -a always,exit -F arch=b64 -S finit_module -S init_module -S delete_module -F auid!=-1 -k T1215_Kernel_Modules_and_Extensions
 -a always,exit -F arch=b32 -S finit_module -S init_module -S delete_module -F auid!=-1 -k T1215_Kernel_Modules_and_Extensions
 -w /etc/modprobe.conf -p wa -k T1215_Kernel_Modules_and_Extensions
--a always,exit -F arch=b64 -S kexec_load -k T1215_Kernel_Modules_and_Extensions
--a always,exit -F arch=b32 -S sys_kexec_load -k T1215_Kernel_Modules_and_Extensions
+-a always,exit -F arch=b64 -S kexec_load -k 	T1014_Rootkit
+-a always,exit -F arch=b32 -S sys_kexec_load -k T1014_Rootkit
 
-## Mount operations (only attributable)
--a always,exit -F arch=b64 -S mount -S umount2 -F auid!=-1 -k mount
--a always,exit -F arch=b32 -S mount -S umount -S umount2 -F auid!=-1 -k mount
-
-# Change swap (only attributable)
--a always,exit -F arch=b64 -S swapon -S swapoff -F auid!=-1 -k swap
--a always,exit -F arch=b32 -S swapon -S swapoff -F auid!=-1 -k swap
+## Additional Hardware or logical disks
+-a always,exit -F arch=b64 -S mount -S umount2 -F auid!=-1 -k T1200_Hardware_Addtions
+-a always,exit -F arch=b32 -S mount -S umount -S umount2 -F auid!=-1 -k T1200_Hardware_Addtions
+-a always,exit -F arch=b64 -S swapon -S swapoff -F auid!=-1 -k T1200_Hardware_Addtions
+-a always,exit -F arch=b32 -S swapon -S swapoff -F auid!=-1 -k T1200_Hardware_Addtions
 
 ## Time Related Events
 -a exit,always -F arch=b32 -S adjtimex -S settimeofday -S clock_settime -k T1099_Timestomp
@@ -185,6 +183,13 @@
 -w /var/log/wtmp -p wa -k T1108_Redundant_Access
 -w /var/log/btmp -p wa -k T1108_Redundant_Access
 
+## Files Obfuscation or Manipulation
+-w /etc/hosts -p wa -k T1027_Obfuscated Files or Information
+-w /etc/sysconfig/network -p wa -k T1027_Obfuscated Files or Information
+-w /etc/network/ -p wa -k T1027_Obfuscated Files or Information
+-a always,exit -F dir=/etc/NetworkManager/ -F perm=wa -k T1027_Obfuscated Files or Information
+-w /etc/sysconfig/network -p wa -k T1027_Obfuscated Files or Information
+
 ## Login Related Events
 -w /var/log/faillog -p wa -k T1021_Remote_Services
 -w /var/log/lastlog -p wa -k T1021_Remote_Services
@@ -239,6 +244,13 @@
 -a always,exit -F arch=b64 -S setuid -S setgid -S setreuid -S setregid -F exit=EPERM -k T1166_Seuid_and_Setgid
 -a always,exit -F arch=b32 -S setuid -S setgid -S setreuid -S setregid -F exit=EPERM -k T1166_Seuid_and_Setgid
  -w /usr/bin/ -p wa -k T1068_Exploitation_for_Privilege_Escalation
+ -a always,exit -F arch=b32 -S all -k T1068_Exploitation_for_Privilege_Escalation
+
+## Power state
+-w /sbin/shutdown -p x -k Power_State_Change
+-w /sbin/poweroff -p x -k Power_State_Change
+-w /sbin/reboot -p x -k Power_State_Change
+-w /sbin/halt -p x -k Power_State_Change
 
 ## Recon Related Events
 -w /etc/group -p wa -k T1087_Account_Discovery
@@ -278,6 +290,16 @@
 -a exit,always -F arch=b32 -S mknod -S mknodat -k T1219_Remote_Access_Tools
 -a exit,always -F arch=b64 -S mknod -S mknodat -k T1219_Remote_Access_Tools
 
+## Critical elements access failures
+-a exit,always -F arch=b64 -S open -F dir=/etc -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/bin -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/sbin -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/usr/bin -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/usr/sbin -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/var -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/home -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+-a exit,always -F arch=b64 -S open -F dir=/srv -F success=0 -k T1068_Exploitation_for_Privilege_Escalation
+
 ## Code injection Related Events
 -a always,exit -F arch=b32 -S ptrace -k T1055_Process_Injection
 -a always,exit -F arch=b64 -S ptrace -k T1055_Process_Injection
@@ -287,6 +309,26 @@
 -a always,exit -F arch=b64 -S ptrace -F a0=0x5 -k T1055_Process_Injection
 -a always,exit -F arch=b32 -S ptrace -F a0=0x6 -k T1055_Process_Injection
 -a always,exit -F arch=b64 -S ptrace -F a0=0x6 -k T1055_Process_Injection
+-w /etc/ld.so.conf -p wa -k libpath -k T1055_Process_Injection
+-w /bin/systemctl -p x -k T1055_Process_Injection
+-w /etc/systemd/ -p wa -k T1055_Process_Injection
+
+
+# Application Deployment Software
+-w /usr/bin/rpm -p x -k T1017_Application_Deployment_Software
+-w /usr/bin/yum -p x -k T1017_Application_Deployment_Software
+-w /sbin/yast -p x -k T1017_Application_Deployment_Software
+-w /sbin/yast2 -p x -k T1017_Application_Deployment_Software
+-w /bin/rpm -p x -k T1017_Application_Deployment_Software
+-w /usr/bin/zypper -k T1017_Application_Deployment_Software
+-w /usr/bin/dpkg -p x -k T1017_Application_Deployment_Software
+-w /usr/bin/apt-add-repository -p x -k T1017_Application_Deployment_Software
+-w /usr/bin/apt-get -p x -k T1017_Application_Deployment_Software
+-w /usr/bin/aptitude -p x -k T1017_Application_Deployment_Software
+-w /etc/puppet/ssl -p wa -k T1017_Application_Deployment_Software
+-a exit,always -F arch=b64 -S open -F dir=/opt/BESClient -F success=0 -k T1017_Application_Deployment_Software
+-w /var/opt/BESClient/ -p wa  -k T1017_Application_Deployment_Software
+-w /etc/chef -p wa -k soft_chef -k T1017_Application_Deployment_Software
 
 ## Shell configuration Persistence Related Events
 -w /etc/profile.d/ -k T1156_bash_profile_and_bashrc
@@ -296,11 +338,6 @@
 -w /etc/csh.cshrc -k T1156_bash_profile_and_bashrc
 -w /etc/csh.login -k T1156_bash_profile_and_bashrc
 
-## File Deletion by User Related Events
--a always,exit -F arch=b32 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k T1107_File_Deletion
--a always,exit -F arch=b64 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k T1107_File_Deletion
--a always,exit -F arch=b32 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid=0 -k T1070_Indicator_Removal_on_Host
--a always,exit -F arch=b64 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid=0 -k T1070_Indicator_Removal_on_Host
 
 # Make the configuration immutable --------------------------------------------
 ##-e 2
