@@ -4,7 +4,7 @@
 # Compiled by Matteo Malvica
 #
 # Created  : 2018/08/17
-# Modified : 2018/08/21
+# Modified : 2018/08/xx
 #
 # Based on Florian Roth work
 
@@ -68,6 +68,18 @@
 -a exit,never -F arch=b32 -S all -F exe=/usr/bin/vmtoolsd
 -a exit,never -F arch=b64 -S all -F exe=/usr/bin/vmtoolsd
 
+## Custom filters
+-a exit,never -F arch=b32 -S all -F path=/usr/libexec/postfix
+-a exit,never -F arch=b64 -S all -F path=/usr/libexec/postfix
+-a exit,never -F arch=b32 -S all -F exe=/usr/sbin/postdrop
+-a exit,never -F arch=b64 -S all -F exe=/usr/sbin/postdrop
+-a exit,never -F arch=b32 -S all -F exe=/usr/sbin/sendmail
+-a exit,never -F arch=b64 -S all -F exe=/usr/sbin/sendmail
+-a exit,never -F arch=b32 -S all -F exe=/usr/sbin/ausearch
+-a exit,never -F arch=b64 -S all -F exe=/usr/sbin/ausearch
+-a exit,never -F arch=b32 -S all -F path=/usr/lib/polkit-1/
+-a exit,never -F arch=b64 -S all -F path=/usr/lib/polkit-1/
+
 ### High Volume Event Filter (especially on Linux Workstations)
 -a exit,never -F arch=b32 -F dir=/dev/shm -k sharedmemaccess
 -a exit,never -F arch=b64 -F dir=/dev/shm -k sharedmemaccess
@@ -130,7 +142,6 @@
 -w /usr/sbin/useradd -p x -k T1078_Valid_Accounts_6
 -w /usr/sbin/usermod -p x -k T1078_Valid_Accounts_7
 -w /usr/sbin/adduser -p x -k T1078_Valid_Accounts_8
-
 
 ## Privleged Command Execution Related Events
 -a always,exit -F path=/usr/sbin/userdel -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts_1
@@ -241,10 +252,10 @@
 -w /sbin/halt -p x -k Power_State_Change_4
 
 ## Recon Related Events
--w /etc/group -p -k T1087_Account_Discovery_1
--w /etc/passwd -p -k TT1087_Account_Discovery_2
--w /etc/gshadow -k T1087_Account_Discovery_3
--w /etc/shadow -k T1087_Account_Discovery_4
+-w /etc/group -p rxaw -k T1087_Account_Discovery_1
+-w /etc/passwd -p rxaw -k TT1087_Account_Discovery_2
+-w /etc/gshadow -p rxaw T1087_Account_Discovery_3
+-w /etc/shadow -p rxaw T1087_Account_Discovery_4
 -w /etc/security/opasswd -k T1087_Account_Discovery_5
 -w /usr/sbin/nologin -k T1087_Account_Discovery_6
 -w /sbin/nologin -k T1087_Account_Discovery_7
@@ -287,6 +298,7 @@
 -a exit,always -F arch=b64 -S open -F dir=/var -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_10
 -a exit,always -F arch=b64 -S open -F dir=/home -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_11
 -a exit,always -F arch=b64 -S open -F dir=/srv -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_12
+-a always,exit -F dir=/home -F uid=0 -F auid>=1000 -F auid!=4294967295 -k T1068_Exploitation_for_Privilege_Escalation_[admin_abuse]
 
 ## Code injection Related Events
 -a always,exit -F arch=b32 -S ptrace -k T1055_Process_Injection_0
