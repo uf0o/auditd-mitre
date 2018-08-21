@@ -254,8 +254,8 @@
 ## Recon Related Events
 -w /etc/group -p rxaw -k T1087_Account_Discovery_1
 -w /etc/passwd -p rxaw -k TT1087_Account_Discovery_2
--w /etc/gshadow -p rxaw T1087_Account_Discovery_3
--w /etc/shadow -p rxaw T1087_Account_Discovery_4
+-w /etc/gshadow -p rxaw -k T1087_Account_Discovery_3
+-w /etc/shadow -p rxaw -k T1087_Account_Discovery_4
 -w /etc/security/opasswd -k T1087_Account_Discovery_5
 -w /usr/sbin/nologin -k T1087_Account_Discovery_6
 -w /sbin/nologin -k T1087_Account_Discovery_7
