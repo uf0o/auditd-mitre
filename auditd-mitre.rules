@@ -3,8 +3,9 @@
 #
 # Compiled by Matteo Malvica
 #
+# Version  : 0.8
 # Created  : 2018/08/17
-# Modified : 2018/08/xx
+# Modified : 2018/08/22
 #
 # Based on Florian Roth work
 
@@ -77,8 +78,12 @@
 -a exit,never -F arch=b64 -S all -F exe=/usr/sbin/sendmail
 -a exit,never -F arch=b32 -S all -F exe=/usr/sbin/ausearch
 -a exit,never -F arch=b64 -S all -F exe=/usr/sbin/ausearch
--a exit,never -F arch=b32 -S all -F path=/usr/lib/polkit-1/
--a exit,never -F arch=b64 -S all -F path=/usr/lib/polkit-1/
+-a exit,never -F arch=b32 -S all -F path=/usr/lib/polkit-1/polkitd
+-a exit,never -F arch=b64 -S all -F path=/usr/lib/polkit-1/polkitd
+-a exit,never -F arch=b32 -S all -F exe=/usr/lib/polkit-1/polkitd
+-a exit,never -F arch=b64 -S all -F exe=/usr/lib/polkit-1/polkitd
+-a exit,never -F arch=b32 -S all -F exe=/usr/libexec/accounts-daemon
+-a exit,never -F arch=b64 -S all -F exe=/usr/libexec/accounts-daemon
 
 ### High Volume Event Filter (especially on Linux Workstations)
 -a exit,never -F arch=b32 -F dir=/dev/shm -k sharedmemaccess
@@ -298,7 +303,7 @@
 -a exit,always -F arch=b64 -S open -F dir=/var -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_10
 -a exit,always -F arch=b64 -S open -F dir=/home -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_11
 -a exit,always -F arch=b64 -S open -F dir=/srv -F success=0 -k T1068_Exploitation_for_Privilege_Escalation_12
--a always,exit -F dir=/home -F uid=0 -F auid>=1000 -F auid!=4294967295 -k T1068_Exploitation_for_Privilege_Escalation_[admin_abuse]
+-a always,exit -F dir=/home -F uid=0 -F auid!=4294967295 -k T1068_Exploitation_for_Privilege_Escalation_[admin_abuse]
 
 ## Code injection Related Events
 -a always,exit -F arch=b32 -S ptrace -k T1055_Process_Injection_0
@@ -312,6 +317,13 @@
 -w /etc/ld.so.conf -p wa -k libpath -k T1055_Process_Injection_8
 -w /bin/systemctl -p wa -k T1055_Process_Injection_9
 -w /etc/systemd/ -p wa -k T1055_Process_Injection_10
+
+# Socket Creations
+# will catch both v4 and v6
+-a always,exit -F arch=b32 -S socket -F a0=2  -k T1011_Exfiltration_Over_Other_Network_Medium_1
+-a always,exit -F arch=b64 -S socket -F a0=2  -k T1011_Exfiltration_Over_Other_Network_Medium_2
+-a always,exit -F arch=b32 -S socket -F a0=10 -k T1011_Exfiltration_Over_Other_Network_Medium_3
+-a always,exit -F arch=b64 -S socket -F a0=10 -k T1011_Exfiltration_Over_Other_Network_Medium_4
 
 # Application Deployment Software
 -w /usr/bin/rpm -p x -k T1017_Application_Deployment_Software_0
