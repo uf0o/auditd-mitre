@@ -5,7 +5,7 @@
 #
 # Version  : 0.8
 # Created  : 2018/08/17
-# Modified : 2018/08/22
+# Modified : 2018/08/24
 #
 # Based on Florian Roth work
 
@@ -39,6 +39,14 @@
 ## Monitor for use of audit management tools
 -w /sbin/auditctl -p x -k T1005_Data_From_Local_System_audit_log_4
 -w /sbin/auditd -p x -k T1005_Data_From_Local_System_audit_log_5
+
+-a always,exit -F arch=b64 -F exe=/lib64/ld-linux-x86-64.so.2 -k T1005_Data_From_Local_System_audit_log_6
+-a always,exit -F arch=b32 -F exe=/lib64/ld-linux-x86-64.so.2 -k T1005_Data_From_Local_System_audit_log_7
+
+-a always,exit -F arch=b64 -F exe=/sbin/auditctl -k T1005_Data_From_Local_System_audit_log_8
+-a always,exit -F arch=b32 -F exe=/sbin/auditctl -k T1005_Data_From_Local_System_audit_log_9
+
+/etc/audit/audit.rules
 
 # Filters ---------------------------------------------------------------------
 
@@ -84,6 +92,18 @@
 -a exit,never -F arch=b64 -S all -F exe=/usr/lib/polkit-1/polkitd
 -a exit,never -F arch=b32 -S all -F exe=/usr/libexec/accounts-daemon
 -a exit,never -F arch=b64 -S all -F exe=/usr/libexec/accounts-daemon
+-a exit,never -F arch=b32 -S all -F exe=/usr/bin/systemd-tmpfiles
+-a exit,never -F arch=b64 -S all -F exe=/usr/bin/systemd-tmpfiles
+-a exit,never -F arch=b32 -S all -F exe=/usr/lib/systemd/systemd-logind
+-a exit,never -F arch=b64 -S all -F exe=/usr/lib/systemd/systemd-logind
+-a exit,never -F arch=b32 -S all -F exe=/usr/bin/bash
+-a exit,never -F arch=b64 -S all -F exe=/usr/bin/bash
+-a exit,never -F arch=b32 -S all -F exe=/usr/bin/updatedb
+-a exit,never -F arch=b64 -S all -F exe=/usr/bin/updatedb
+-a exit,never -F arch=b64 -S fork -F exe=/usr/sbin/unix_chkpwd
+-a exit,never -F arch=b32 -S fork -F exe=/usr/sbin/unix_chkpwd
+-a exit,never -F arch=b64 -S all -F exe=/usr/libexec/postfix/pickup
+-a exit,never -F arch=b32 -S all -F exe=/usr/libexec/postfix/pickup
 
 ### High Volume Event Filter (especially on Linux Workstations)
 -a exit,never -F arch=b32 -F dir=/dev/shm -k sharedmemaccess
@@ -258,7 +278,7 @@
 
 ## Recon Related Events
 -w /etc/group -p rxaw -k T1087_Account_Discovery_1
--w /etc/passwd -p rxaw -k TT1087_Account_Discovery_2
+-w /etc/passwd -p xaw -k TT1087_Account_Discovery_2
 -w /etc/gshadow -p rxaw -k T1087_Account_Discovery_3
 -w /etc/shadow -p rxaw -k T1087_Account_Discovery_4
 -w /etc/security/opasswd -k T1087_Account_Discovery_5
